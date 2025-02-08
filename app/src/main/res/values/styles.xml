@@ -1,0 +1,38 @@
+<resources>
+    <!-- Base App Theme -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Primary Colors -->
+        <item name="colorPrimary">@color/orange</item>
+        <item name="colorPrimaryDark">@color/dark_orange</item>
+        <item name="colorAccent">@color/orange</item>
+
+        <!-- Backgrounds and Text -->
+        <item name="android:windowBackground">@color/light_background</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorSecondary">@color/gray</item>
+        <item name="android:editTextBackground">@drawable/rounded_edit_text</item>
+
+        <!-- ActionBar and Toolbar -->
+        <item name="android:actionBarStyle">@style/CustomActionBar</item>
+        <item name="android:toolbarStyle">@style/CustomToolbar</item>
+    </style>
+
+    <!-- Custom Action Bar -->
+    <style name="CustomActionBar" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@color/orange</item>
+        <item name="android:titleTextStyle">@style/ActionBarTitleText</item>
+    </style>
+
+    <style name="ActionBarTitleText" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <!-- Custom Toolbar -->
+    <style name="CustomToolbar" parent="Widget.AppCompat.Toolbar">
+        <item name="android:background">@color/orange</item>
+        <item name="titleTextColor">@color/white</item>
+    </style>
+
+
+</resources>

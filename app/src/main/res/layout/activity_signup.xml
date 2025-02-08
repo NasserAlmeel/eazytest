@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light_background">
+
+    <!-- Decorative Shape at the Top -->
+    <View
+        android:id="@+id/topShape"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:background="@drawable/top_decorative_shape"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/signupTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create Account"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-medium"
+        android:layout_marginTop="140dp"
+        android:layout_centerHorizontal="true" />
+
+    <!-- Full Name Input -->
+    <EditText
+        android:id="@+id/edit_name"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/rounded_edit_text"
+        android:hint="Full Name"
+        android:padding="12dp"
+        android:layout_below="@id/signupTitle" />
+
+    <!-- Phone Input -->
+    <EditText
+        android:id="@+id/edit_phone"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_edit_text"
+        android:hint="Phone"
+        android:padding="12dp"
+        android:layout_below="@id/edit_name"
+        android:inputType="phone" />
+
+    <!-- Email Input -->
+    <EditText
+        android:id="@+id/edit_email"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_edit_text"
+        android:hint="Email"
+        android:padding="12dp"
+        android:inputType="textEmailAddress"
+        android:layout_below="@id/edit_phone" />
+
+    <!-- Password Input -->
+    <EditText
+        android:id="@+id/edit_password"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_edit_text"
+        android:hint="Password"
+        android:padding="12dp"
+        android:inputType="textPassword"
+        android:layout_below="@id/edit_email" />
+
+    <!-- Confirm Password Input -->
+    <EditText
+        android:id="@+id/confirmPasswordEditText"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_edit_text"
+        android:hint="Confirm Password"
+        android:padding="12dp"
+        android:inputType="textPassword"
+        android:layout_below="@id/edit_password" />
+
+    <!-- Sign Up Button -->
+    <Button
+        android:id="@+id/btn_signup"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="@color/orange"
+        android:text="Sign Up"
+        android:textColor="@color/white"
+        android:layout_below="@id/confirmPasswordEditText" />
+
+    <!-- Progress Bar -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/btn_signup"
+        android:visibility="gone"
+        android:layout_marginTop="16dp" />
+
+    <!-- Login Link -->
+    <TextView
+        android:id="@+id/loginText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Already have an account? Sign in"
+        android:textColor="@color/orange"
+        android:textSize="14sp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/progressBar"
+        android:layout_marginTop="16dp" />
+
+</RelativeLayout>
