@@ -22,7 +22,6 @@
 
         <activity android:name=".SignupActivity" android:exported="false"/>
         <activity android:name=".MainActivity" android:exported="false"/>
-        <activity android:name=".ProfileActivity" />
         <activity android:name=".ForgetPasswordActivity" />
         <activity android:name=".UserDetailsActivity" />
 

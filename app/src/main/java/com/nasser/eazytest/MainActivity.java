@@ -153,7 +153,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (itemId == R.id.nav_developer) {
             Toast.makeText(this, "Developed by Nasser Almeel", Toast.LENGTH_SHORT).show();
         } else if (itemId == R.id.nav_logout) {
-            Toast.makeText(this, "Logged Out", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);

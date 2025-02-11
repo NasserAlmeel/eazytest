@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +26,7 @@ public class SignupActivity extends AppCompatActivity {
     private EditText nameEdit, emailEdit, phoneEdit, passwordEdit;
     private Button signupButton;
     private ProgressBar progressBar;
+    private TextView loginText;
 
     private AuthService authService;
     private static final String TAG = "SignupActivity";
@@ -41,12 +43,16 @@ public class SignupActivity extends AppCompatActivity {
         passwordEdit = findViewById(R.id.edit_password);
         signupButton = findViewById(R.id.btn_signup);
         progressBar = findViewById(R.id.progressBar);
+        loginText = findViewById(R.id.loginText);
 
         // Initialize AuthService
         authService = RetrofitClient.getInstance(this).create(AuthService.class);
 
         // Handle signup button click
         signupButton.setOnClickListener(v -> handleSignup());
+
+        // Handle login text click
+        loginText.setOnClickListener(v -> navigateToLogin());
     }
 
     private void handleSignup() {
@@ -142,8 +148,8 @@ public class SignupActivity extends AppCompatActivity {
             return false;
         }
 
-        if (phone.isEmpty() || !phone.matches("^[+]?[0-9]{10,13}$")) {
-            phoneEdit.setError("Enter a valid phone number (10-13 digits, optional +).");
+        if (phone.isEmpty() || !phone.matches("^?[0-9]{8}$")) {
+            phoneEdit.setError("Enter a valid phone number (8 digits)");
             phoneEdit.requestFocus();
             return false;
         }
