@@ -18,7 +18,7 @@ public class RetrofitClient {
     private static volatile Retrofit retrofit;
     private static final String BASE_URL = BuildConfig.SUPABASE_URL;
     private static final String API_KEY = BuildConfig.SUPABASE_API_KEY;
-    private static final String TAG = "RetrofitClient"; // ✅ Logging Tag
+    private static final String TAG = "RetrofitClient"; //  Logging Tag
 
     /**
      * Provides a singleton instance of Retrofit.
@@ -39,13 +39,13 @@ public class RetrofitClient {
                                 @Override
                                 public Response intercept(Chain chain) throws IOException {
                                     Request originalRequest = chain.request();
-                                    String userToken = getTokenFromSharedPreferences(context); // ✅ Get User's Auth Token
+                                    String userToken = getTokenFromSharedPreferences(context); // Get User's Auth Token
 
                                     Request.Builder requestBuilder = originalRequest.newBuilder()
                                             .header("apikey", API_KEY)
                                             .header("Content-Type", "application/json");
 
-                                    // ✅ If user token exists, use it instead of API key for Authorization
+                                    //  If user token exists, use it instead of API key for Authorization
                                     if (userToken != null && !userToken.isEmpty()) {
                                         requestBuilder.header("Authorization", "Bearer " + userToken);
                                     } else {
@@ -54,7 +54,7 @@ public class RetrofitClient {
 
                                     Request newRequest = requestBuilder.build();
 
-                                    // ✅ Log request headers for debugging
+                                    //  Log request headers for debugging
                                     Log.d(TAG, "Headers: " + newRequest.headers());
 
                                     return chain.proceed(newRequest);
@@ -94,6 +94,6 @@ public class RetrofitClient {
      */
     private static String getTokenFromSharedPreferences(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("SecurePrefs", Context.MODE_PRIVATE);
-        return sharedPreferences.getString("auth_token", ""); // ✅ Returns empty string if no token is found
+        return sharedPreferences.getString("auth_token", ""); //  Returns empty string if no token is found
     }
 }

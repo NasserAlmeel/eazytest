@@ -32,7 +32,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
     private AuthService authService;
-    private static final String TAG = "LoginActivity"; // ✅ Logging Tag
+    private static final String TAG = "LoginActivity"; //  Logging Tag
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +80,7 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setEnabled(false);
         signupButton.setEnabled(false);
 
-        // ✅ Correct Query Parameter Format
+        //  Correct Query Parameter Format
         String formattedEmail = "eq." + email;
 
         // Fetch user by email from the database
@@ -96,7 +96,7 @@ public class LoginActivity extends AppCompatActivity {
                 signupButton.setEnabled(true);
 
                 if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
-                    User user = response.body().get(0); // ✅ Assuming unique emails, get the first user
+                    User user = response.body().get(0); //  Assuming unique emails, get the first user
 
                     Log.d(TAG, "User Found: " + user.getEmail());
 

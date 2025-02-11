@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // ✅ Initialize Views
+        //  Initialize Views
         toolbar = findViewById(R.id.toolbar);
         recyclerView = findViewById(R.id.recyclerView);
         progressBar = findViewById(R.id.progressBar);
@@ -53,26 +53,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView = findViewById(R.id.nav_view);
 
 
-        // ✅ Find NavigationView
+        // Find NavigationView
         NavigationView navigationView = findViewById(R.id.nav_view);
 
-        // ✅ Get Header View
+        // Get Header View
         View headerView = navigationView.getHeaderView(0);
 
-        // ✅ Find TextView in Header
+        // Find TextView in Header
         TextView userNameTextView = headerView.findViewById(R.id.nav_user_name);
 
-        // ✅ Retrieve User's Name from SharedPreferences or API
+        // Retrieve User's Name from SharedPreferences or API
         SharedPreferences sharedPreferences = getSharedPreferences("SecurePrefs", MODE_PRIVATE);
         String userName = sharedPreferences.getString("user_name", "Hi"); // Default: "User Name"
 
-        // ✅ Set User Name in Drawer
+        // Set User Name in Drawer
         userNameTextView.setText(userName);
 
-        // ✅ Setup Toolbar as ActionBar
+        // Setup Toolbar as ActionBar
         setSupportActionBar(toolbar);
 
-        // ✅ Setup Navigation Drawer
+        // Setup Navigation Drawer
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
@@ -84,18 +84,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         userAdapter = new UserAdapter(this, userList);
         recyclerView.setAdapter(userAdapter);
 
-        // ✅ Initialize Retrofit Inside MainActivity
+        //  Initialize Retrofit Inside MainActivity
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://randomuser.me/") // ✅ API Base URL
+                .baseUrl("https://randomuser.me/") //  API Base URL
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         apiService = retrofit.create(ApiService.class);
 
-        // ✅ Load Initial Data
+        //  Load Initial Data
         fetchRandomUsers(currentPage);
 
-        // ✅ Infinite Scroll Listener
+        //  Infinite Scroll Listener
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 int totalItemCount = layoutManager.getItemCount();
                 int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
 
-                // ✅ Load more users when reaching the bottom
+                //  Load more users when reaching the bottom
                 if (!isLoading && lastVisibleItemPosition >= totalItemCount - 3) {
                     currentPage++;
                     fetchRandomUsers(currentPage);

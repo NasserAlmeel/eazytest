@@ -40,7 +40,7 @@ public interface AuthService {
     Call<List<User>> getUserByEmail(
             @Header("Authorization") String token,
             @Header("apikey") String apiKey,
-            @Query(value = "email", encoded = true) String email // ✅ Prevent encoding issues
+            @Query(value = "email", encoded = true) String email //  Prevent encoding issues
     );
 
     /**
