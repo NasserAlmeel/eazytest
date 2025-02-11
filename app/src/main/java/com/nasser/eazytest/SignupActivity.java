@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import retrofit2.Call;
@@ -26,7 +27,6 @@ public class SignupActivity extends AppCompatActivity {
     private ProgressBar progressBar;
 
     private AuthService authService;
-
     private static final String TAG = "SignupActivity";
 
     @Override
@@ -55,34 +55,56 @@ public class SignupActivity extends AppCompatActivity {
         String phone = phoneEdit.getText().toString().trim();
         String password = passwordEdit.getText().toString().trim();
 
-        // Validate inputs
         if (!validateInputs(name, email, phone, password)) {
             return;
         }
 
-        // Hash the password securely
         String hashedPassword = hashPassword(password);
         if (hashedPassword == null) {
             Toast.makeText(this, "Error hashing password. Please try again.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Show loading indicator and disable button
         progressBar.setVisibility(View.VISIBLE);
         signupButton.setEnabled(false);
 
-        // Create a User object
-        User user = new User(name, phone, email, hashedPassword);
+        // Step 1: Check if the email already exists in the database
+        authService.getUserByEmail(
+                "Bearer " + BuildConfig.SUPABASE_API_KEY,
+                BuildConfig.SUPABASE_API_KEY,
+                email
+        ).enqueue(new Callback<List<User>>() {
+            @Override
+            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
+                    // Email already exists
+                    progressBar.setVisibility(View.GONE);
+                    signupButton.setEnabled(true);
+                    Toast.makeText(SignupActivity.this, "Email already registered. Try logging in.", Toast.LENGTH_LONG).show();
+                } else {
+                    // Step 2: If email does not exist, proceed with signup
+                    createUser(name, email, phone, hashedPassword);
+                }
+            }
 
-        // Save user data to the database
-        // Ensure `user` is correctly passed as a User object
+            @Override
+            public void onFailure(Call<List<User>> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                signupButton.setEnabled(true);
+                Log.e(TAG, "Error checking email existence", t);
+                Toast.makeText(SignupActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void createUser(String name, String email, String phone, String password) {
+        User user = new User(email, name, phone, password);
+
         authService.saveUserData(
-                "Bearer " + BuildConfig.SUPABASE_API_KEY, // ✅ Authorization token (String)
-                BuildConfig.SUPABASE_API_KEY, // ✅ API key (String)
-                new User(name, phone, email, hashedPassword) // ✅ User object (Correct type)
+                "Bearer " + BuildConfig.SUPABASE_API_KEY,
+                BuildConfig.SUPABASE_API_KEY,
+                user
         ).enqueue(new Callback<Void>() {
-
-
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 progressBar.setVisibility(View.GONE);
@@ -92,11 +114,8 @@ public class SignupActivity extends AppCompatActivity {
                     Toast.makeText(SignupActivity.this, "Signup successful!", Toast.LENGTH_SHORT).show();
                     navigateToLogin();
                 } else {
-                    Log.e(TAG, "Signup failed: Response Code: " + response.code());
-                    String message = response.code() == 400
-                            ? "Invalid input data. Please check your details."
-                            : "Signup failed. Please try again later.";
-                    Toast.makeText(SignupActivity.this, message, Toast.LENGTH_LONG).show();
+                    Log.e(TAG, "Signup failed: Response Code: " + response.code() + ", Error: " + response.message());
+                    Toast.makeText(SignupActivity.this, "Signup failed. Check input and try again.", Toast.LENGTH_LONG).show();
                 }
             }
 

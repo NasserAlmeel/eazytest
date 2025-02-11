@@ -6,52 +6,69 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
     <!-- Main Content -->
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <!-- Toolbar -->
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/orange"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            android:elevation="4dp"
-            app:title="EazyTest"
-            app:titleTextColor="@android:color/white" />
-
-        <!-- Main Content -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="8dp"
-            tools:listitem="@layout/item_image" />
+            android:orientation="vertical">
 
+            <!-- Toolbar -->
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/orange"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                android:elevation="4dp"
+                app:title="EazyTest"
+                app:titleTextColor="@android:color/white" />
+
+            <!-- RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="8dp"
+                tools:listitem="@layout/item_image" />
+
+            <!-- Empty State Text -->
+            <TextView
+                android:id="@+id/emptyStateText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No images available."
+                android:textSize="16sp"
+                android:gravity="center"
+                android:visibility="gone"
+                android:padding="16dp" />
+
+            <!-- Progress Bar -->
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- Load More Indicator -->
         <ProgressBar
-            android:id="@+id/progressBar"
+            android:id="@+id/loadMoreProgressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginBottom="16dp"
             android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/emptyStateText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="No images available."
-            android:textSize="16sp"
-            android:gravity="center"
-            android:visibility="gone"
-            android:padding="16dp" />
-
-
-    </LinearLayout>
+    </FrameLayout>
 
     <!-- Navigation Drawer -->
     <com.google.android.material.navigation.NavigationView
@@ -59,6 +76,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:fitsSystemWindows="true"
         android:background="@color/white"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/drawer_menu"

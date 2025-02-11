@@ -67,19 +67,6 @@
         android:layout_below="@id/emailEditText"
         android:contentDescription="Enter your password" />
 
-    <!-- Forgot Password -->
-    <TextView
-        android:id="@+id/forgotPasswordText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Forgot?"
-        android:textColor="@color/orange"
-        android:textSize="14sp"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="40dp"
-        android:layout_below="@id/passwordEditText"
-        android:layout_marginTop="8dp"
-        android:contentDescription="Forgot password link" />
 
     <!-- Login Button -->
     <Button
@@ -91,7 +78,7 @@
         android:backgroundTint="@color/orange"
         android:text="Login"
         android:textColor="@color/white"
-        android:layout_below="@id/forgotPasswordText"
+        android:layout_below="@id/passwordEditText"
         android:contentDescription="Login button" />
 
     <ProgressBar
