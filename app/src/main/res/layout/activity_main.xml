@@ -26,20 +26,31 @@
             app:titleTextColor="@android:color/white" />
 
         <!-- Main Content -->
-        <FrameLayout
-            android:id="@+id/main_content"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/light_background">
+            android:padding="8dp"
+            tools:listitem="@layout/item_image" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Welcome to EazyTest!"
-                android:textSize="24sp"
-                android:gravity="center"
-                android:padding="20dp" />
-        </FrameLayout>
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/emptyStateText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No images available."
+            android:textSize="16sp"
+            android:gravity="center"
+            android:visibility="gone"
+            android:padding="16dp" />
+
+
     </LinearLayout>
 
     <!-- Navigation Drawer -->

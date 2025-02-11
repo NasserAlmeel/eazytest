@@ -17,7 +17,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         android.buildFeatures.buildConfig true
-        buildConfigField "String", "SUPABASE_API_KEY", "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlZmxmanFrbHlxYm12Z2tocGR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU2NDEzMDEsImV4cCI6MjA1MTIxNzMwMX0.qZY87yoqAAeC3wsBGKDHlK22afrofBoBfRAejfD3U94\""
+        buildConfigField "String", "SUPABASE_API_KEY", "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlZmxmanFrbHlxYm12Z2tocGR3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczNTY0MTMwMSwiZXhwIjoyMDUxMjE3MzAxfQ.at9TcOZ2bZND7qas7V0nVR12bTn1wkjy2sou7SEvJnE\""
         buildConfigField "String", "SUPABASE_URL", "\"https://aeflfjqklyqbmvgkhpdw.supabase.co/\""
 
     }
@@ -41,9 +41,20 @@ dependencies {
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'androidx.security:security-crypto:1.0.0'
+    implementation 'com.github.bumptech.glide:glide:4.15.1'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.10.0'
+    implementation "androidx.work:work-runtime:2.8.0"
+    implementation "androidx.security:security-crypto:1.1.0-alpha06"
+
+
+
+
+    // Commented out as it cannot be resolved:
+    // implementation 'com.some.library:image-library:1.0.0'
 
 }

@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light_background">
+    android:background="@color/light_background"
+    android:padding="16dp">
 
     <!-- Decorative Shape at the Top -->
     <View
@@ -45,11 +46,12 @@
         android:layout_height="50dp"
         android:layout_marginHorizontal="32dp"
         android:layout_marginTop="24dp"
-        android:background="@drawable/rounded_edit_text"
+        android:background="@drawable/rounded_text_view"
         android:hint="Email"
         android:padding="12dp"
         android:layout_below="@id/loginSubtitle"
-        android:inputType="textEmailAddress" />
+        android:inputType="textEmailAddress"
+        android:contentDescription="Enter your email address" />
 
     <!-- Password Input -->
     <EditText
@@ -58,11 +60,12 @@
         android:layout_height="50dp"
         android:layout_marginHorizontal="32dp"
         android:layout_marginTop="16dp"
-        android:background="@drawable/rounded_edit_text"
+        android:background="@drawable/rounded_text_view"
         android:hint="Password"
         android:padding="12dp"
         android:inputType="textPassword"
-        android:layout_below="@id/emailEditText" />
+        android:layout_below="@id/emailEditText"
+        android:contentDescription="Enter your password" />
 
     <!-- Forgot Password -->
     <TextView
@@ -75,7 +78,8 @@
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="40dp"
         android:layout_below="@id/passwordEditText"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:contentDescription="Forgot password link" />
 
     <!-- Login Button -->
     <Button
@@ -87,29 +91,40 @@
         android:backgroundTint="@color/orange"
         android:text="Login"
         android:textColor="@color/white"
-        android:layout_below="@id/forgotPasswordText" />
+        android:layout_below="@id/forgotPasswordText"
+        android:contentDescription="Login button" />
 
-    <!-- Sign Up Link -->
-    <TextView
-        android:id="@+id/signUpText"
+    <ProgressBar
+        android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Don't have an account? Sign up"
-        android:textColor="@color/orange"
+        android:layout_gravity="center"
+        android:visibility="gone" /> <!-- Initially hidden -->
+
+
+    <!-- Sign-Up Link -->
+    <TextView
+        android:id="@+id/signUpPromptText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Don't have an account?"
+        android:textColor="@color/gray"
         android:textSize="14sp"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/loginButton"
         android:layout_marginTop="16dp" />
+
+    <!-- Sign-Up Button -->
     <Button
         android:id="@+id/signupButton"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="40dp"
-        android:backgroundTint="@color/orange"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/gray"
         android:text="Sign Up"
         android:textColor="@color/white"
-        android:layout_below="@id/loginButton" />
-
+        android:layout_below="@id/signUpPromptText"
+        android:contentDescription="Sign up button" />
 
 </RelativeLayout>

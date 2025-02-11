@@ -2,86 +2,143 @@ package com.nasser.eazytest;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
-import retrofit2.http.Headers;
-import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
+import retrofit2.http.Query;
+
+import java.util.List;
 
 public interface AuthService {
-    String API_KEY = BuildConfig.SUPABASE_API_KEY;
 
-    // Login user with email and password
-    @Headers({
-            "apikey: " + API_KEY,
-            "Content-Type: application/json"
-    })
-    @POST("auth/v1/token?grant_type=password")
-    Call<LoginResponse> loginUser(@Body LoginRequest loginRequest);
-
-    // Register a new user
-    @Headers({
-            "apikey: " + API_KEY,
-            "Content-Type: application/json"
-    })
-    @POST("auth/v1/signup")
-    Call<SignupResponse> registerUser(@Body SignupRequest signupRequest);
-
-    // Get user details
-    @Headers({
-            "apikey: " + API_KEY
-    })
-    @GET("auth/v1/user")
-    Call<User> getUser(
-            @Header("Authorization") String token
-    );
-
-    // Update user details
-    @Headers({
-            "apikey: " + API_KEY,
-            "Content-Type: application/json"
-    })
-    @PUT("auth/v1/user")
-    Call<Void> updateUser(
+    /**
+     * Save user data into the `users` table.
+     *
+     * @param user   User object containing user details.
+     * @param token  Authorization token.
+     * @param apiKey Supabase API key.
+     * @return Void Call object.
+     */
+    @POST("rest/v1/users")
+    Call<Void> saveUserData(
+            @Body User user,
             @Header("Authorization") String token,
-            @Body User user
+            @Header("apikey") String apiKey
     );
 
-    // Delete user account
-    @Headers({
-            "apikey: " + API_KEY
-    })
-    @DELETE("auth/v1/user")
-    Call<Void> deleteUser(@Header("Authorization") String token);
+    /**
+     * Get user data from the `users` table by email.
+     *
+     * @param email  User email to filter.
+     * @param token  Authorization token.
+     * @param apiKey Supabase API key.
+     * @return Call object with a list of User objects.
+     */
+    @GET("rest/v1/users")
+    Call<List<User>> getUserByEmail(
+            @Query("email") String email,
+            @Header("Authorization") String token,
+            @Header("apikey") String apiKey
+    );
 
-    // Save user data in the custom database table
-    @Headers({
-            "apikey: " + API_KEY,
-            "Content-Type: application/json"
-    })
+    /**
+     * Update user data in the `users` table by UUID.
+     *
+     * @param userId UUID of the user to update.
+     * @param user   Updated user data.
+     * @param token  Authorization token.
+     * @param apiKey Supabase API key.
+     * @return Void Call object.
+     */
+    @PUT("rest/v1/users")
+    Call<Void> updateUserData(
+            @Query("id") String userId, // UUID as a String
+            @Body User user,
+            @Header("Authorization") String token,
+            @Header("apikey") String apiKey
+    );
+
+    /**
+     * Login user using a custom Supabase RPC function.
+     *
+     * @param loginRequest Object containing email and password.
+     * @param token        Authorization token.
+     * @param apiKey       Supabase API key.
+     * @return Call object for LoginResponse.
+     */
+    @POST("rest/v1/rpc/login_user")
+    Call<LoginResponse> loginUser(
+            @Body LoginRequest loginRequest,
+            @Header("Authorization") String token,
+            @Header("apikey") String apiKey
+    );
+
+    /**
+     * Register a new user in the `users` table.
+     *
+     * @param signupRequest Object containing user details.
+     * @param token         Authorization token.
+     * @param apiKey        Supabase API key.
+     * @return Call object for SignupResponse.
+     */
+    @POST("rest/v1/users")
+    Call<SignupResponse> registerUser(
+            @Body SignupRequest signupRequest,
+            @Header("Authorization") String token,
+            @Header("apikey") String apiKey
+    );
+
+
+    /**
+     * Execute SQL for table creation or schema updates.
+     *
+     * @param query  SQL query string to execute.
+     * @param token  Authorization token.
+     * @param apiKey Supabase API key.
+     * @return Void Call object.
+     */
+    @POST("rest/v1/rpc/executesql")
+    Call<Void> executeSQL(
+            @Body String query,
+            @Header("Authorization") String token,
+            @Header("apikey") String apiKey
+    );
+
+    /**
+     * Reset user password using a custom Supabase RPC function.
+     *
+     * @param resetRequest Object containing reset details (e.g., email).
+     * @param token        Authorization token.
+     * @param apiKey       Supabase API key.
+     * @return Void Call object.
+     */
+    @POST("rest/v1/rpc/reset_password")
+    Call<Void> resetPassword(
+            @Body PasswordResetRequest resetRequest,
+            @Header("Authorization") String token,
+            @Header("apikey") String apiKey
+    );
+
+    /**
+     * Delete a user by UUID.
+     *
+     * @param userId UUID of the user to delete.
+     * @param token  Authorization token.
+     * @param apiKey Supabase API key.
+     * @return Void Call object.
+     */
+    @POST("rest/v1/users/delete") // Replace with the actual endpoint for deleting a user in your API
+    Call<Void> deleteUser(
+            @Query("id") String userId, // UUID as a String
+            @Header("Authorization") String token,
+            @Header("apikey") String apiKey
+    );
+
     @POST("rest/v1/users")
     Call<Void> saveUserData(
             @Header("Authorization") String token,
+            @Header("apikey") String apiKey,
             @Body User user
     );
-
-    // Update user password
-    @Headers({
-            "apikey: " + API_KEY,
-            "Content-Type: application/json"
-    })
-    @PATCH("auth/v1/password")
-    Call<Void> updatePassword(
-            @Header("Authorization") String token,
-            @Body PasswordUpdateRequest request
-    );
-
-    @Headers({
-            "apikey: " + API_KEY,
-            "Content-Type: application/json"
-    })
-    @POST("auth/v1/recover")
-    Call<Void> resetPassword(@Body String email);
 }

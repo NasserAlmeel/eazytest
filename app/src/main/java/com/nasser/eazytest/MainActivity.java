@@ -1,106 +1,99 @@
 package com.nasser.eazytest;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.navigation.NavigationView;
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 public class MainActivity extends AppCompatActivity {
-    private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
-    private ActionBarDrawerToggle toggle;
-    private TextView headerEmail;
+    private RecyclerView recyclerView;
+    private ImageAdapter imageAdapter;
+    private List<Image> imageList = new ArrayList<>();
+    private ProgressBar progressBar;
+
+    private boolean isLoading = false;
+    private int currentPage = 1;
+    private final int pageSize = 20; // Number of images to fetch per page
+
+    private ApiService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Setup Toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        // Initialize Views
+        recyclerView = findViewById(R.id.recyclerView);
+        progressBar = findViewById(R.id.progressBar);
 
-        // Setup Drawer Layout
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Setup Drawer Toggle Button
-        toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close);
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
+        // Initialize Adapter
+        imageAdapter = new ImageAdapter(this, imageList);
+        recyclerView.setAdapter(imageAdapter);
 
-        // Get Header View
-        View headerView = navigationView.getHeaderView(0);
-        headerEmail = headerView.findViewById(R.id.header_email);
+        // Initialize ApiService
+        apiService = RetrofitClient.getInstance(this).create(ApiService.class);
 
-        // Load User Email
-        SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
-        String userEmail = sharedPreferences.getString("user_email", "User Email");
-        headerEmail.setText(userEmail);
+        // Load Initial Data
+        loadImages(currentPage, pageSize);
 
-        // Handle Navigation Item Clicks
-        navigationView.setNavigationItemSelectedListener(item -> {
-            handleNavigationItemSelected(item);
-            return true;
+        // Setup Infinite Scrolling
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (!isLoading && layoutManager != null &&
+                        layoutManager.findLastVisibleItemPosition() >= imageList.size() - 1) {
+                    // Load more data when scrolled to the bottom
+                    currentPage++;
+                    loadImages(currentPage, pageSize);
+                }
+            }
         });
     }
 
-    // Handle Navigation Item Selections
-    private void handleNavigationItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
+    private void loadImages(int page, int limit) {
+        isLoading = true;
+        progressBar.setVisibility(View.VISIBLE);
 
-        if (id == R.id.nav_profile) {
-            openProfile();
-        } else if (id == R.id.nav_version) {
-            Toast.makeText(MainActivity.this, "Version 1.0.0", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.nav_developer) {
-            Toast.makeText(MainActivity.this, "Developed by Nasser", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.nav_logout) {
-            logoutUser();
-        }
+        Call<List<Image>> call = apiService.getImages(page, limit);
+        call.enqueue(new Callback<List<Image>>() {
+            @Override
+            public void onResponse(Call<List<Image>> call, Response<List<Image>> response) {
+                isLoading = false;
+                progressBar.setVisibility(View.GONE);
 
-        drawerLayout.closeDrawers();
-    }
+                if (response.isSuccessful() && response.body() != null) {
+                    imageList.addAll(response.body());
+                    imageAdapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(MainActivity.this, "No more images to load.", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-    // Open Profile Activity
-    private void openProfile() {
-        SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
-        String userEmail = sharedPreferences.getString("user_email", "No Email Found");
-
-        Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-        intent.putExtra("email", userEmail);
-        startActivity(intent);
-    }
-
-    // Logout Function
-    private void logoutUser() {
-        SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.apply();
-
-        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (toggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+            @Override
+            public void onFailure(Call<List<Image>> call, Throwable t) {
+                isLoading = false;
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

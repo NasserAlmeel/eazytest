@@ -1,105 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light_background">
+    android:background="@color/light_background"
+    android:fillViewport="true">
 
-    <!-- Title -->
-    <TextView
-        android:id="@+id/profileTitle"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Profile Information"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:fontFamily="sans-serif-medium"
-        android:layout_marginTop="50dp"
-        android:layout_centerHorizontal="true" />
+        android:padding="16dp">
 
-    <!-- Full Name Input -->
-    <EditText
-        android:id="@+id/fullNameEditText"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="24dp"
-        android:background="@drawable/rounded_edit_text"
-        android:hint="Full Name"
-        android:padding="12dp"
-        android:layout_below="@id/profileTitle" />
+        <!-- Title -->
+        <TextView
+            android:id="@+id/profileTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Profile Information"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginTop="50dp"
+            android:layout_centerHorizontal="true" />
 
-    <!-- Email Input -->
-    <EditText
-        android:id="@+id/emailEditText"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/rounded_edit_text"
-        android:hint="Email"
-        android:padding="12dp"
-        android:layout_below="@id/fullNameEditText"
-        android:inputType="textEmailAddress" />
+        <!-- Full Name -->
+        <TextView
+            android:id="@+id/txtName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/rounded_text_view"
+            android:text="Full Name"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:padding="12dp"
+            android:layout_below="@id/profileTitle" />
 
-    <!-- Phone Input -->
-    <EditText
-        android:id="@+id/phoneEditText"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/rounded_edit_text"
-        android:hint="Phone"
-        android:padding="12dp"
-        android:layout_below="@id/emailEditText" />
+        <!-- Email -->
+        <TextView
+            android:id="@+id/txtEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/rounded_text_view"
+            android:text="Email"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:padding="12dp"
+            android:layout_below="@id/txtName" />
 
-    <!-- Password Input -->
-    <EditText
-        android:id="@+id/passwordEditText"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/rounded_edit_text"
-        android:hint="Password"
-        android:padding="12dp"
-        android:layout_below="@id/phoneEditText" />
+        <!-- Phone -->
+        <TextView
+            android:id="@+id/txtPhone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/rounded_text_view"
+            android:text="Phone"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:padding="12dp"
+            android:layout_below="@id/txtEmail" />
 
-    <!-- Update Button -->
-    <Button
-        android:id="@+id/btn_update"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="32dp"
-        android:backgroundTint="@color/orange"
-        android:text="Update"
-        android:textColor="@color/white"
-        android:layout_below="@id/passwordEditText" />
+        <!-- Logout Button -->
+        <Button
+            android:id="@+id/logoutButton"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="32dp"
+            android:backgroundTint="@color/orange"
+            android:text="Logout"
+            android:textColor="@color/white"
+            android:layout_below="@id/txtPhone" />
 
-    <Button
-        android:id="@+id/btn_delete"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/orange"
-        android:text="Delete"
-        android:textColor="@color/white"
-        android:layout_below="@id/btn_update" />
-
-
-    <!-- Logout Button -->
-    <Button
-        android:id="@+id/logoutButton"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/orange"
-        android:text="Logout"
-        android:textColor="@color/white"
-        android:layout_below="@id/btn_delete" />
-
-</RelativeLayout>
+    </RelativeLayout>
+</ScrollView>

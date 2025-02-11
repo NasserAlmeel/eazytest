@@ -1,24 +1,23 @@
 package com.nasser.eazytest;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ProfileActivity extends AppCompatActivity {
-    private EditText editName, editEmail, editPhone, editPassword;
-    private Button btnUpdate, btnDelete;
-
+    private TextView txtName, txtEmail, txtPhone;
     private AuthService authService;
 
     @Override
@@ -26,36 +25,18 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        // Initialize views
-        editName = findViewById(R.id.fullNameEditText);
-        editEmail = findViewById(R.id.emailEditText);
-        editPhone = findViewById(R.id.phoneEditText);
-        editPassword = findViewById(R.id.passwordEditText);
-        btnUpdate = findViewById(R.id.btn_update);
-        btnDelete = findViewById(R.id.btn_delete);
+        // Initialize views (TextViews only, no EditTexts)
+        txtName = findViewById(R.id.txtName);
+        txtEmail = findViewById(R.id.txtEmail);
+        txtPhone = findViewById(R.id.txtPhone);
 
         // Initialize AuthService
-        authService = RetrofitClient.getInstance().create(AuthService.class);
+        authService = RetrofitClient.getInstance(this).create(AuthService.class);
 
         // Fetch User Data
         fetchUserData();
 
-        // Button listeners
-        btnUpdate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updateUser();
-            }
-        });
-
-        btnDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                deleteUser();
-            }
-        });
-
-        // Handle Back Button
+        // Enable Back Button in ActionBar
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
@@ -71,109 +52,53 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void fetchUserData() {
-        String token = getSharedPreferences("MyAppPrefs", MODE_PRIVATE).getString("auth_token", "");
+        String token = getToken();
+        String email = getStoredEmail();
 
-        Call<User> call = authService.getUser("Bearer " + token);
-        call.enqueue(new Callback<User>() {
-            @Override
-            public void onResponse(Call<User> call, Response<User> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    User user = response.body();
-                    editName.setText(user.getName());
-                    editEmail.setText(user.getEmail());
-                    editPhone.setText(user.getPhone());
-                } else {
-                    Toast.makeText(ProfileActivity.this, "Failed to load user data. Please try again.", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<User> call, Throwable t) {
-                Toast.makeText(ProfileActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void updateUser() {
-        String token = getSharedPreferences("MyAppPrefs", MODE_PRIVATE).getString("auth_token", "");
-
-        String name = editName.getText().toString().trim();
-        String email = editEmail.getText().toString().trim();
-        String phone = editPhone.getText().toString().trim();
-
-        // Validate inputs
-        if (name.isEmpty() || email.isEmpty() || phone.isEmpty()) {
-            Toast.makeText(this, "All fields are required.", Toast.LENGTH_SHORT).show();
+        if (token.isEmpty() || email.isEmpty()) {
+            Toast.makeText(this, "Session expired. Please log in again.", Toast.LENGTH_LONG).show();
+            navigateToLogin();
             return;
         }
 
-        User updatedUser = new User(name, phone, email);
+        authService.getUserByEmail("Bearer " + token, BuildConfig.SUPABASE_API_KEY, email)
+                .enqueue(new Callback<List<User>>() {
+                    @Override
+                    public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                        if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
+                            User user = response.body().get(0);
+                            txtName.setText(user.getName());
+                            txtEmail.setText(user.getEmail());
+                            txtPhone.setText(user.getPhone());
+                        } else {
+                            Toast.makeText(ProfileActivity.this, "Failed to load user data.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
 
-        Call<Void> call = authService.updateUser("Bearer " + token, updatedUser);
-        call.enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(ProfileActivity.this, "Profile updated successfully!", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(ProfileActivity.this, "Failed to update profile. Please try again.", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                Toast.makeText(ProfileActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+                    @Override
+                    public void onFailure(Call<List<User>> call, Throwable t) {
+                        Toast.makeText(ProfileActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
-    private void deleteUser() {
-        String token = getSharedPreferences("MyAppPrefs", MODE_PRIVATE).getString("auth_token", "");
-
-        Call<Void> call = authService.deleteUser("Bearer " + token);
-        call.enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(ProfileActivity.this, "Profile deleted successfully!", Toast.LENGTH_SHORT).show();
-                    finish();
-                } else {
-                    Toast.makeText(ProfileActivity.this, "Failed to delete profile. Please try again.", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                Toast.makeText(ProfileActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+    private String getToken() {
+        SharedPreferences prefs = getSharedPreferences("SecurePrefs", MODE_PRIVATE);
+        return prefs.getString("auth_token", "");
     }
 
-    private void updatePassword(String newPassword) {
-        String token = getSharedPreferences("MyAppPrefs", MODE_PRIVATE).getString("auth_token", "");
+    private String getStoredEmail() {
+        SharedPreferences prefs = getSharedPreferences("SecurePrefs", MODE_PRIVATE);
+        return prefs.getString("user_email", "");
+    }
 
-        if (newPassword.isEmpty()) {
-            Toast.makeText(this, "Password cannot be empty.", Toast.LENGTH_SHORT).show();
-            return;
-        }
+    private void navigateToLogin() {
+        SharedPreferences.Editor editor = getSharedPreferences("SecurePrefs", MODE_PRIVATE).edit();
+        editor.clear().apply();
 
-        PasswordUpdateRequest request = new PasswordUpdateRequest(newPassword);
-
-        Call<Void> call = authService.updatePassword("Bearer " + token, request);
-        call.enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(ProfileActivity.this, "Password updated successfully!", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(ProfileActivity.this, "Failed to update password. Please try again.", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                Toast.makeText(ProfileActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 }

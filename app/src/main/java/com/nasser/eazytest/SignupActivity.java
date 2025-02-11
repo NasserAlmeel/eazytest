@@ -1,8 +1,9 @@
 package com.nasser.eazytest;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -10,6 +11,10 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.regex.Pattern;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -21,6 +26,8 @@ public class SignupActivity extends AppCompatActivity {
     private ProgressBar progressBar;
 
     private AuthService authService;
+
+    private static final String TAG = "SignupActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +43,7 @@ public class SignupActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
 
         // Initialize AuthService
-        authService = RetrofitClient.getInstance().create(AuthService.class);
+        authService = RetrofitClient.getInstance(this).create(AuthService.class);
 
         // Handle signup button click
         signupButton.setOnClickListener(v -> handleSignup());
@@ -48,94 +55,112 @@ public class SignupActivity extends AppCompatActivity {
         String phone = phoneEdit.getText().toString().trim();
         String password = passwordEdit.getText().toString().trim();
 
-        // Input validation
+        // Validate inputs
         if (!validateInputs(name, email, phone, password)) {
             return;
         }
 
-        // Show loading indicator
+        // Hash the password securely
+        String hashedPassword = hashPassword(password);
+        if (hashedPassword == null) {
+            Toast.makeText(this, "Error hashing password. Please try again.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Show loading indicator and disable button
         progressBar.setVisibility(View.VISIBLE);
+        signupButton.setEnabled(false);
 
-        // Step 1: Create user with email and password
-        SignupRequest signupRequest = new SignupRequest(email, password);
-        Call<SignupResponse> call = authService.registerUser(signupRequest);
+        // Create a User object
+        User user = new User(name, phone, email, hashedPassword);
 
-        call.enqueue(new Callback<SignupResponse>() {
+        // Save user data to the database
+        // Ensure `user` is correctly passed as a User object
+        authService.saveUserData(
+                "Bearer " + BuildConfig.SUPABASE_API_KEY, // ✅ Authorization token (String)
+                BuildConfig.SUPABASE_API_KEY, // ✅ API key (String)
+                new User(name, phone, email, hashedPassword) // ✅ User object (Correct type)
+        ).enqueue(new Callback<Void>() {
+
+
             @Override
-            public void onResponse(Call<SignupResponse> call, Response<SignupResponse> response) {
+            public void onResponse(Call<Void> call, Response<Void> response) {
                 progressBar.setVisibility(View.GONE);
+                signupButton.setEnabled(true);
 
-                if (response.isSuccessful() && response.body() != null) {
-                    // Save token
-                    saveToken(response.body().getAccessToken());
-
-                    // Step 2: Save additional fields to the database
-                    saveAdditionalUserData(name, phone, email);
+                if (response.isSuccessful()) {
+                    Toast.makeText(SignupActivity.this, "Signup successful!", Toast.LENGTH_SHORT).show();
+                    navigateToLogin();
                 } else {
-                    Toast.makeText(SignupActivity.this, "Signup failed: " + response.message(), Toast.LENGTH_LONG).show();
+                    Log.e(TAG, "Signup failed: Response Code: " + response.code());
+                    String message = response.code() == 400
+                            ? "Invalid input data. Please check your details."
+                            : "Signup failed. Please try again later.";
+                    Toast.makeText(SignupActivity.this, message, Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<SignupResponse> call, Throwable t) {
+            public void onFailure(Call<Void> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
+                signupButton.setEnabled(true);
+                Log.e(TAG, "Signup failed", t);
                 Toast.makeText(SignupActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private boolean validateInputs(String name, String email, String phone, String password) {
-        if (name.isEmpty()) {
-            nameEdit.setError("Name is required");
+        if (name.isEmpty() || name.length() < 3) {
+            nameEdit.setError("Name must be at least 3 characters long.");
+            nameEdit.requestFocus();
             return false;
         }
 
-        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailEdit.setError("Enter a valid email");
+        if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emailEdit.setError("Enter a valid email address.");
+            emailEdit.requestFocus();
             return false;
         }
 
-        if (phone.isEmpty() || phone.length() < 8) {
-            phoneEdit.setError("Enter a valid phone number");
+        if (phone.isEmpty() || !phone.matches("^[+]?[0-9]{10,13}$")) {
+            phoneEdit.setError("Enter a valid phone number (10-13 digits, optional +).");
+            phoneEdit.requestFocus();
             return false;
         }
 
-        if (password.isEmpty() || password.length() < 6) {
-            passwordEdit.setError("Password must be at least 6 characters");
+        if (!isValidPassword(password)) {
+            passwordEdit.setError("Password must contain uppercase, lowercase, number, and special character.");
+            passwordEdit.requestFocus();
             return false;
         }
 
         return true;
     }
 
-    private void saveToken(String token) {
-        SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("auth_token", token);
-        editor.apply();
+    private boolean isValidPassword(String password) {
+        Pattern passwordPattern = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,}$");
+        return passwordPattern.matcher(password).matches();
     }
 
-    private void saveAdditionalUserData(String name, String phone, String email) {
-        String token = getSharedPreferences("MyAppPrefs", MODE_PRIVATE).getString("auth_token", "");
-        User user = new User(name, phone, email);
+    private String hashPassword(String password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedHash = digest.digest(password.getBytes());
+            StringBuilder hexString = new StringBuilder();
 
-        Call<Void> call = authService.saveUserData("Bearer " + token, user);
-        call.enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(SignupActivity.this, "Signup successful!", Toast.LENGTH_SHORT).show();
-                    navigateToLogin();
-                } else {
-                    Toast.makeText(SignupActivity.this, "Failed to save user data", Toast.LENGTH_SHORT).show();
+            for (byte b : encodedHash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
                 }
+                hexString.append(hex);
             }
-
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                Toast.makeText(SignupActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            Log.e(TAG, "Error hashing password", e);
+            return null;
+        }
     }
 
     private void navigateToLogin() {
